@@ -1,7 +1,7 @@
 # spellcheck
 
-Quick implementation of the Levenshtein Formula in Java. Gives spelling suggestions of a single word off a database of 370,101 English words. Because of the size of database, the algorithm is very slow. You can test it with a smaller one (though you may have to tinker with the csv parsing to get it to work properly), try smaller words, or add your own optimizations to the program. There are many ways it can be optimized, and I may come back in the future to improve it.
+Quick spelling correction program using Levenshtein distance in Java. Gives mispelled words spelling suggestions of an input phrase based off a database of 370,101 English words. Example contains recursive and matrix implementation with respective time complexities of `O(3^(m+n))` and `O(mn)`. Program uses matrix implementation, but recursive is present as a learning excercise.
 
-[source](https://www.irjet.net/archives/V8/i9/IRJET-V8I9316.pdf)
+[Source paper](https://www.irjet.net/archives/V8/i9/IRJET-V8I9316.pdf)
 
 ![Levenshtein Formula](github-resources/levenshtein-formula.png "Levenshtein Formula")

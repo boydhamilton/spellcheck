@@ -10,7 +10,7 @@ public class spellcheck{
 
     
 
-    static int levenshteinRecursive(String given, String check, int m, int n){
+    static int levenshteinRecursive(String given, String check, int m, int n){ // time complexity: O(3^(m+n))
     /*  three edit moves are:
             - removal
             - addition
@@ -30,13 +30,41 @@ public class spellcheck{
         }
         
         return 1 + Math.min(
-        levenshteinRecursive(given, check, m, n-1),Math.min(
-        levenshteinRecursive(given, check, m-1, n),
-        levenshteinRecursive(given, check, m-1, n-1)));
+        levenshteinRecursive(given, check, m, n-1),Math.min( // insertion
+        levenshteinRecursive(given, check, m-1, n), // removal
+        levenshteinRecursive(given, check, m-1, n-1))); // substitution
+    }
+    static int levenshteinMatrix(String given, String check){
+        int m = given.length();
+        int n = check.length();
+        int[][] matrix = new int[m+1][n+1]; // each row is a character in respective string, +1 is to account for whitespace at position string[-1]
+
+        for(int i=0; i<=m; i++){
+            matrix[i][0] = i;
+        }
+        for(int i=0; i<=n; i++){
+            matrix[0][i] = i;
+        }
+        char[] givencarr = given.toCharArray();
+        char[] checkcarr = check.toCharArray();
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (givencarr[i - 1] == checkcarr[j-1]) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = 1 + Math.min(
+                            matrix[i][j - 1],Math.min(
+                            matrix[i - 1][j],
+                            matrix[i - 1][j - 1]));
+                }
+            }
+        }
+        return matrix[m][n];
     }
 
-    public static String[] autocorrect(String phrase){
-        String fileName = "words_pos.csv";
+
+    public static String[] suggestions(String phrase){
+        String fileName = "data/words_pos.csv";
         List<List<String>> rows = new ArrayList<>();
 
         try{
@@ -59,14 +87,14 @@ public class spellcheck{
 
         List<String> possibilities = new ArrayList<>();
         if (!Arrays.asList(words).contains(phrase)){
-            int cbDistance = 2; // current best
+            int range = 2; // current best
             for(String word : words){
-                int d = levenshteinRecursive(phrase, word, phrase.length(), word.length());
-                if(d<cbDistance){
+                int d = levenshteinMatrix(phrase, word);
+                if(d<range){
                     possibilities.clear();
-                    cbDistance = d;
+                    range = d;
                     possibilities.add(word);
-                }else if(d==cbDistance){
+                }else if(d==range){
                     possibilities.add(word);
                 }
             }
@@ -77,15 +105,21 @@ public class spellcheck{
     }
 
     public static void main(String[] args){
-
         Scanner scanner = new Scanner(System.in);
-        String phrase = scanner.nextLine();
+        String[] phrase = scanner.nextLine().split(" ");
+        scanner.close();
 
-        String[] corrections = autocorrect(phrase);
-        for(String maybe : corrections){
-            System.out.println(maybe);
+        for(String s : phrase){
+            String[] corrections = suggestions(s.toLowerCase());
+            if(corrections[0]!="Correct"){
+                System.out.println("\n ("+s+") Did you mean...");
+                for(String maybe : corrections){
+                    System.out.print(maybe+" ");
+                }
+                System.out.println("");
+            }
+            
         }
         
-        scanner.close();
     }
 }
